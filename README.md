@@ -24,6 +24,29 @@ python -m http.server 8099 -d site
 
 然后打开 `http://127.0.0.1:8099/`。直接用 `file://` 双击打开也可以，只是首屏动态山脊会因为浏览器的模块加载限制自动降级成静态图（这是设计好的降级路径，不是故障）。
 
+## 部署与更新
+
+站点已发布两处：
+
+| 方式 | 地址 | 说明 |
+|---|---|---|
+| 平台托管 | <https://zhouhao-portfolio.app.workbuddy.host/> | 国内访问快，改完内容在对话里说一声即可重新发布 |
+| GitHub Pages | <https://zhou-hao52.github.io/> | 永久地址，仓库 `zhou-hao52/zhou-hao52.github.io` |
+
+**关于推送**：本机网络下 `github.com` 的 HTTPS 被阻断（TCP 能连上、TLS 被重置），
+所以不能用常规 `git push` / `gh auth login --web`。改完内容后用项目根目录的脚本推送：
+
+```bash
+python tools/08_push_github.py
+```
+
+该脚本走 `api.github.com`（可达），用 Git Data API（blobs → tree → commit → ref）
+整体推送，token 自动从系统凭据管理器读取，无需手动配置。
+追加 `--enable-pages` 可同时检查 Pages 状态，`--dry-run` 只列出待上传文件。
+
+若日后网络恢复，也可用常规方式：`git remote add origin git@github.com:zhou-hao52/zhou-hao52.github.io.git`
+（SSH 22 端口实测可达，但需先把本机 `~/.ssh/id_ed25519.pub` 加到 GitHub 账号的 SSH keys 里）。
+
 ## 目录结构
 
 ```
