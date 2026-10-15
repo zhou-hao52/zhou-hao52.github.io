@@ -47,6 +47,41 @@ python tools/08_push_github.py
 若日后网络恢复，也可用常规方式：`git remote add origin git@github.com:zhou-hao52/zhou-hao52.github.io.git`
 （SSH 22 端口实测可达，但需先把本机 `~/.ssh/id_ed25519.pub` 加到 GitHub 账号的 SSH keys 里）。
 
+## 以后部署别的站点
+
+GitHub Pages 的地址规则：**用户页每个账号只能有一个**（`zhou-hao52.github.io`，占根域，已被本站占用），
+但**项目页不限数量**——任意其它仓库都对应一个独立地址：
+
+```
+https://zhou-hao52.github.io/<仓库名>/
+```
+
+一个仓库就是一个站点，互不干扰。要部署新站点，一条命令：
+
+```bash
+cd "D:\OneDrive\Desktop\简历优化"
+python tools\08_push_github.py --dir <站点目录> --repo <仓库名> --create --enable-pages
+```
+
+仓库不存在会自动创建（公开），随后自动开启 Pages 并打印访问地址。
+
+常用参数：
+
+| 参数 | 作用 |
+|---|---|
+| `--dir` | 要部署的本地目录（默认项目内的 `site/`） |
+| `--repo` | 仓库名，决定子路径；不写则用目录名 |
+| `--create` | 仓库不存在时自动新建 |
+| `--enable-pages` | 推送后开启并检查 Pages |
+| `--custom-domain` | 绑定自定义域名，如 `www.example.com` |
+| `--dry-run` | 只列出待上传文件与最终地址，不推送 |
+| `--owner` | 换账号或组织（组织可另得一个根域 `org.github.io`） |
+
+**一个硬性要求**：项目页跑在子路径下，所以站点内部必须用**相对路径**引用资源
+（写 `assets/x.css` 而不是 `/assets/x.css`），否则会 404。本站已经是相对路径，改文案不会破坏这点。
+
+想要更好看的地址可以买域名（`.com` 约 ¥50/年），再 `--custom-domain` 绑上来，任意 Pages 仓库都能绑。
+
 ## 目录结构
 
 ```
