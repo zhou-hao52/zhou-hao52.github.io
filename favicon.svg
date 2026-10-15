@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="周昊">
+  <rect width="64" height="64" rx="14" fill="#f1efea"/>
+  <path d="M9 41c7 0 9-19 16-19s7 24 14 24 7-14 12-14 4 7 8 7"
+        fill="none" stroke="#e5482d" stroke-width="4.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="53" cy="32" r="3.4" fill="#2f5d50"/>
+</svg>

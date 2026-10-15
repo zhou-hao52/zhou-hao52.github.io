@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>周昊 · Zhou Hao — 网络空间安全 / AI 应用 / 美工设计</title>
+<meta name="description" content="周昊（Zhou Hao）——武汉大学国家网络安全学院 2025 级本科生。把想法做成能上线的东西：微信小程序、交互可视化与美工设计。">
+<meta name="theme-color" content="#f1efea">
+<meta name="author" content="周昊 (Zhou Hao)">
+<link rel="canonical" href="https://zhou-hao52.github.io/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="周昊 · Zhou Hao — 网络空间安全 / AI 应用 / 美工设计">
+<meta property="og:description" content="小程序开发 · 交互可视化 · AI 应用 · 美工设计。武汉大学国家网络安全学院 2025 级本科。">
+<meta property="og:url" content="https://zhou-hao52.github.io/">
+<meta property="og:image" content="og.png">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/instrument-serif-latin-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/sections.css">
+
+<script>
+  /* 首帧之前确定性能档位，避免切换闪烁 */
+  try { document.documentElement.dataset.tier = localStorage.getItem('sd:tier') || 'auto'; } catch (e) {}
+</script>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"周昊","alternateName":["Zhou Hao"],
+"affiliation":{"@type":"CollegeOrUniversity","name":"Wuhan University"},
+"alumniOf":{"@type":"CollegeOrUniversity","name":"武汉大学国家网络安全学院"},
+"knowsAbout":["网络空间安全","微信小程序开发","AI 应用","交互可视化","设计"],
+"email":"zhou20070502@qq.com"}
+</script>
+
+<style>
+/* 字体：Instrument Serif（OFL）拉丁子集自托管，中文自动落回系统宋体 */
+@font-face{font-family:"Instrument Serif";font-style:normal;font-weight:400;font-display:swap;
+  src:url(assets/fonts/instrument-serif-latin-400-normal.woff2) format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Serif";font-style:italic;font-weight:400;font-display:swap;
+  src:url(assets/fonts/instrument-serif-latin-400-italic.woff2) format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<!-- ======================= 顶部导航 ======================= -->
+<header class="nav" data-nav>
+  <a class="brand" href="#intro" aria-label="周昊 首页">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M1 15c3 0 4-8 7-8s3 10 6 10 3-6 5-6 2 3 4 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </span>
+    <span class="who">周昊<span class="mute"> · Zhou Hao</span></span>
+  </a>
+  <nav aria-label="主导航">
+    <ul>
+      <li><a href="#intro" data-sec="intro" aria-current="page"><span class="n">01</span><span class="l">Introduction</span><span class="s">Intro</span></a></li>
+      <li><a href="#works" data-sec="works"><span class="n">02</span><span class="l">Selected Works</span><span class="s">Works</span></a></li>
+      <li><a href="#design" data-sec="design"><span class="n">03</span><span class="l">Design</span><span class="s">Design</span></a></li>
+      <li><a href="#journey" data-sec="journey"><span class="n">04</span><span class="l">Journey</span><span class="s">Journey</span></a></li>
+      <li><a href="#contact" data-sec="contact"><span class="n">05</span><span class="l">Contact</span><span class="s">Contact</span></a></li>
+    </ul>
+  </nav>
+  <button class="tier" type="button" data-tier-btn aria-label="切换渲染质量档位">
+    <span class="t-x">质量</span><span class="v mono" data-tier-label>Auto</span>
+  </button>
+</header>
+
+<main id="main">
+
+<!-- ======================= 01 Intro ======================= -->
+<section id="intro" class="hero" data-section="intro" data-gl="none" aria-labelledby="intro-title">
+  <div class="stage" aria-hidden="true">
+    <canvas class="gl" data-hero-canvas></canvas>
+    <div class="fallback"></div>
+  </div>
+
+  <div class="copy wrap">
+    <p class="eyebrow mono">
+      <span class="dot" aria-hidden="true"></span>
+      网络空间安全 · 本科 2025 级 · 武汉大学
+    </p>
+
+    <h1 id="intro-title" class="title display">
+      <span class="ln"><span style="--i:0">Zhou</span></span>
+      <span class="ln r"><span style="--i:1"><em>Hao</em></span></span>
+    </h1>
+
+    <div class="lower">
+      <p class="tag">
+        <span class="ln"><span style="--i:2">把想法做成</span></span>
+        <span class="ln"><span style="--i:3"><em>能上线的东西。</em></span></span>
+      </p>
+      <ul class="facts">
+        <li style="--i:4"><span class="k mute">在读</span>武汉大学 · 国家网络安全学院</li>
+        <li style="--i:5"><span class="k mute">年级</span>2025 级 · 本科</li>
+        <li style="--i:6"><span class="k mute">专业</span>网络空间安全（计算机类）</li>
+        <li style="--i:7"><span class="k mute">方向</span>AI 应用 · 前端与小程序 · 美工设计</li>
+      </ul>
+      <p class="zh" style="--i:8">周昊 <span class="mute">/ Zhou Hao</span></p>
+    </div>
+
+    <a class="cue mono" href="#works"><span>Scroll</span><span class="bar" aria-hidden="true"></span></a>
+  </div>
+</section>
+
+<!-- ======================= 02 Selected Works ======================= -->
+<section id="works" class="works" data-section="works" aria-labelledby="works-title">
+  <div class="signal" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="sec-head">
+      <span class="idx">02</span>
+      <h2 id="works-title">Selected Works</h2>
+      <span class="mono mute">06 projects</span>
+    </header>
+
+    <ol class="list">
+
+      <!-- 01 榫卯 -->
+      <li class="work">
+        <a class="hit" href="https://sunmao.base44.app" target="_blank" rel="noopener">
+          <div class="media rv-mask">
+            <div class="wm" style="--accent:#8a5a2b">
+              <div class="shots">
+                <div class="phone solo">
+                  <div class="scr">
+                    <picture>
+                      <source type="image/avif" srcset="assets/img/works/sunmao-640.avif 640w, assets/img/works/sunmao-1200.avif 1200w" sizes="(max-width:900px) 60vw, 26vw">
+                      <img src="assets/img/works/sunmao-1200.webp" alt="榫卯跨文化交互可视化网页截图" width="900" height="1600" loading="lazy" decoding="async">
+                    </picture>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info rv">
+            <p class="num mono">01 <span class="mute">/ 06</span></p>
+            <h3 class="display">榫卯<span class="en">Sunmao</span></h3>
+            <p class="sum">把中国传统木构里的榫卯连接做成可交互的跨文化可视化网页，用图形语言解释「不用一钉一胶」的受力与咬合原理。</p>
+            <dl class="meta">
+              <div><dt>Year</dt><dd>2026</dd></div>
+              <div><dt>Role</dt><dd>交互设计 · 前端实现</dd></div>
+              <div><dt>Status</dt><dd>已上线 · sunmao.base44.app</dd></div>
+            </dl>
+            <ul class="tags"><li><span class="chip">交互可视化</span></li><li><span class="chip">传统建筑</span></li><li><span class="chip">Web</span></li></ul>
+            <span class="more">打开线上站点 <span class="arr">→</span></span>
+          </div>
+        </a>
+      </li>
+
+      <!-- 02 智诊干眼 -->
+      <li class="work alt">
+        <div class="hit">
+          <div class="media rv-mask">
+            <div class="wm" style="--accent:#2f8f83">
+              <div class="shots">
+                <div class="phone">
+                  <div class="scr">
+                    <video data-video preload="none" playsinline muted loop
+                           poster="assets/video/干眼.poster.webp"
+                           width="604" height="1280">
+                      <source src="assets/video/干眼.mp4" type="video/mp4">
+                    </video>
+                    <button class="play" type="button" data-play aria-label="播放智诊干眼演示视频">
+                      <span class="tri" aria-hidden="true"></span>播放演示
+                    </button>
+                  </div>
+                </div>
+                <div class="phone p1">
+                  <div class="scr">
+                    <img src="assets/video/干眼.poster-b.webp" alt="" width="604" height="1280" loading="lazy" decoding="async">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info rv">
+            <p class="num mono">02 <span class="mute">/ 06</span></p>
+            <h3 class="display">智诊干眼 · 睛彩未来<span class="en">Dry Eye AI</span></h3>
+            <p class="sum">面向干眼症的 AI 自查与随访小程序：把症状量表、报告解读和用眼建议串成一条能真正照着做的流程。</p>
+            <dl class="meta">
+              <div><dt>Year</dt><dd>2026</dd></div>
+              <div><dt>Role</dt><dd>小程序开发 · 界面设计</dd></div>
+              <div><dt>Status</dt><dd>已上线 · 演示视频</dd></div>
+            </dl>
+            <ul class="tags"><li><span class="chip">微信小程序</span></li><li><span class="chip">AI 问诊</span></li><li><span class="chip">医疗健康</span></li></ul>
+            <a class="more" href="https://zhizhenganyan.base44.app" target="_blank" rel="noopener">打开线上版本 <span class="arr">→</span></a>
+          </div>
+        </div>
+      </li>
+
+      <!-- 03 李凭箜篌引 -->
+      <li class="work">
+        <div class="hit">
+          <div class="media rv-mask">
+            <div class="wm" style="--accent:#2b3f6b">
+              <div class="shots">
+                <div class="phone">
+                  <div class="scr">
+                    <video data-video preload="none" playsinline muted loop
+                           poster="assets/video/箜篌.poster.webp"
+                           width="642" height="1280">
+                      <source src="assets/video/箜篌.mp4" type="video/mp4">
+                    </video>
+                    <button class="play" type="button" data-play aria-label="播放李凭箜篌引演示视频">
+                      <span class="tri" aria-hidden="true"></span>播放演示
+                    </button>
+                  </div>
+                </div>
+                <div class="phone p1">
+                  <div class="scr">
+                    <img src="assets/video/箜篌.poster-b.webp" alt="" width="642" height="1280" loading="lazy" decoding="async">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info rv">
+            <p class="num mono">03 <span class="mute">/ 06</span></p>
+            <h3 class="display">李凭箜篌引<span class="en">Konghou</span></h3>
+            <p class="sum">以李贺同名唐诗为线索的沉浸式小程序，用插画、音律与逐句注解还原诗里那把「昆山玉碎凤凰叫」的箜篌。</p>
+            <dl class="meta">
+              <div><dt>Year</dt><dd>2026</dd></div>
+              <div><dt>Role</dt><dd>小程序开发 · 视觉设计</dd></div>
+              <div><dt>Status</dt><dd>已上线 · 计设中南赛区一等奖</dd></div>
+            </dl>
+            <ul class="tags"><li><span class="chip">微信小程序</span></li><li><span class="chip">数字人文</span></li><li><span class="chip">插画</span></li></ul>
+            <a class="more" href="https://konghou.base44.app" target="_blank" rel="noopener">打开线上版本 <span class="arr">→</span></a>
+          </div>
+        </div>
+      </li>
+
+      <!-- 04 霞客同行 -->
+      <li class="work alt">
+        <div class="hit">
+          <div class="media rv-mask">
+            <div class="wm" style="--accent:#1f6f5c">
+              <div class="shots">
+                <div class="phone">
+                  <div class="scr">
+                    <video data-video preload="none" playsinline muted loop
+                           poster="assets/video/霞客.poster.webp"
+                           width="634" height="1280">
+                      <source src="assets/video/霞客.mp4" type="video/mp4">
+                    </video>
+                    <button class="play" type="button" data-play aria-label="播放霞客同行演示视频">
+                      <span class="tri" aria-hidden="true"></span>播放演示
+                    </button>
+                  </div>
+                </div>
+                <div class="phone p1">
+                  <div class="scr">
+                    <img src="assets/video/霞客.poster-b.webp" alt="" width="634" height="1280" loading="lazy" decoding="async">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info rv">
+            <p class="num mono">04 <span class="mute">/ 06</span></p>
+            <h3 class="display">霞客同行<span class="en">Xiake</span></h3>
+            <p class="sum">以徐霞客游记为叙事框架的路线探索小程序，把地理节点、游记文本和实地打卡串在一张地图上。</p>
+            <dl class="meta">
+              <div><dt>Year</dt><dd>2026</dd></div>
+              <div><dt>Role</dt><dd>小程序开发 · 地图与内容结构</dd></div>
+              <div><dt>Status</dt><dd>已上线 · 演示视频</dd></div>
+            </dl>
+            <ul class="tags"><li><span class="chip">微信小程序</span></li><li><span class="chip">地图</span></li><li><span class="chip">文旅</span></li></ul>
+            <a class="more" href="https://xiake.base44.app" target="_blank" rel="noopener">打开线上版本 <span class="arr">→</span></a>
+          </div>
+        </div>
+      </li>
+
+      <!-- 05 轮台 -->
+      <li class="work">
+        <div class="hit">
+          <div class="media rv-mask">
+            <div class="wm" style="--accent:#b07a2a">
+              <div class="shots">
+                <div class="phone">
+                  <div class="scr">
+                    <video data-video preload="none" playsinline muted loop
+                           poster="assets/video/轮台.poster.webp"
+                           width="634" height="1280">
+                      <source src="assets/video/轮台.mp4" type="video/mp4">
+                    </video>
+                    <button class="play" type="button" data-play aria-label="播放轮台演示视频">
+                      <span class="tri" aria-hidden="true"></span>播放演示
+                    </button>
+                  </div>
+                </div>
+                <div class="phone p1">
+                  <div class="scr">
+                    <img src="assets/video/轮台.poster-b.webp" alt="" width="634" height="1280" loading="lazy" decoding="async">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info rv">
+            <p class="num mono">05 <span class="mute">/ 06</span></p>
+            <h3 class="display">轮台<span class="en">Luntai</span></h3>
+            <p class="sum">面向轮台胡杨林景区的文旅服务小程序，把服务区导览、行程规划和在地特产收进同一个入口。</p>
+            <dl class="meta">
+              <div><dt>Year</dt><dd>2026</dd></div>
+              <div><dt>Role</dt><dd>小程序开发 · 界面设计</dd></div>
+              <div><dt>Status</dt><dd>演示视频</dd></div>
+            </dl>
+            <ul class="tags"><li><span class="chip">微信小程序</span></li><li><span class="chip">文旅</span></li><li><span class="chip">导览</span></li></ul>
+            <span class="more">暂无公开线上地址 <span class="arr">·</span></span>
+          </div>
+        </div>
+      </li>
+
+      <!-- 06 本站 -->
+      <li class="work alt">
+        <div class="hit">
+          <div class="media rv-mask">
+            <div class="wm" style="--accent:#e5482d">
+              <div class="shots">
+                <div class="phone solo">
+                  <div class="scr">
+                    <picture>
+                      <source type="image/avif" srcset="assets/img/works/portfolio-640.avif 640w, assets/img/works/portfolio-1200.avif 1200w" sizes="(max-width:900px) 60vw, 26vw">
+                      <img src="assets/img/works/portfolio-1200.webp" alt="本站首页截图：信号山脊主视觉与页脚" width="900" height="1600" loading="lazy" decoding="async">
+                    </picture>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info rv">
+            <p class="num mono">06 <span class="mute">/ 06</span></p>
+            <h3 class="display">本站<span class="en">This Portfolio</span></h3>
+            <p class="sum">你正在浏览的这一页。零构建的纯静态站点，首屏山脊用 Canvas 2D 现算，其余全部是手写 HTML 与 CSS。</p>
+            <dl class="meta">
+              <div><dt>Year</dt><dd>2026</dd></div>
+              <div><dt>Role</dt><dd>设计 · 开发</dd></div>
+              <div><dt>Status</dt><dd>持续迭代</dd></div>
+            </dl>
+            <ul class="tags"><li><span class="chip">纯静态</span></li><li><span class="chip">Canvas 2D</span></li><li><span class="chip">设计系统</span></li></ul>
+            <span class="more">当前页面 <span class="arr">·</span></span>
+          </div>
+        </div>
+      </li>
+
+    </ol>
+
+    <!-- 紧凑索引 -->
+    <div class="index">
+      <p class="mono mute">Index</p>
+      <ul>
+        <li><a href="https://sunmao.base44.app" target="_blank" rel="noopener"><span class="mono mute">01</span><span class="nm">榫卯</span><span class="tg mute">交互可视化 · Web</span><span class="mono yr mute">2026</span></a></li>
+        <li><a href="https://zhizhenganyan.base44.app" target="_blank" rel="noopener"><span class="mono mute">02</span><span class="nm">智诊干眼</span><span class="tg mute">微信小程序 · AI 问诊</span><span class="mono yr mute">2026</span></a></li>
+        <li><a href="https://konghou.base44.app" target="_blank" rel="noopener"><span class="mono mute">03</span><span class="nm">李凭箜篌引</span><span class="tg mute">微信小程序 · 数字人文</span><span class="mono yr mute">2026</span></a></li>
+        <li><a href="https://xiake.base44.app" target="_blank" rel="noopener"><span class="mono mute">04</span><span class="nm">霞客同行</span><span class="tg mute">微信小程序 · 文旅地图</span><span class="mono yr mute">2026</span></a></li>
+        <li><a href="#works"><span class="mono mute">05</span><span class="nm">轮台</span><span class="tg mute">微信小程序 · 景区服务</span><span class="mono yr mute">2026</span></a></li>
+        <li><a href="#intro"><span class="mono mute">06</span><span class="nm">本站</span><span class="tg mute">纯静态 · Canvas 2D</span><span class="mono yr mute">2026</span></a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 03 Design ======================= -->
+<section id="design" class="design" data-section="design" data-tone="dark" aria-labelledby="design-title">
+  <div class="orbit" aria-hidden="true">
+    <svg viewBox="0 0 600 600">
+      <ellipse class="o o1" cx="300" cy="300" rx="292" ry="160"/>
+      <ellipse class="o o2" cx="300" cy="300" rx="210" ry="286"/>
+      <circle class="o o3" cx="300" cy="300" r="182"/>
+      <ellipse class="o o4" cx="300" cy="300" rx="120" ry="272"/>
+    </svg>
+  </div>
+  <div class="wrap">
+    <header class="sec-head">
+      <span class="idx">03</span>
+      <h2 id="design-title">Design</h2>
+      <span class="mono mute">03 posters · 03 decks</span>
+    </header>
+
+    <p class="lead">把信息排整齐，<br><em>让它在三秒内被看懂。</em></p>
+
+    <div class="group">
+    <p class="group-label"><span class="mono mute">Posters</span><span class="mono mute">03 张 · 竖版</span></p>
+    <ul class="deck posters">
+
+      <!-- 海报 -->
+      <li class="card">
+        <button class="view" type="button"
+                data-lb-src="assets/img/design/worldcup-1200.webp"
+                data-lb-alt="美加墨世界杯主题海报"
+                data-lb-cap="Poster · 美加墨世界杯">
+          <span class="cv">
+            <picture>
+              <source type="image/avif" srcset="assets/img/design/worldcup-640.avif 640w, assets/img/design/worldcup-1200.avif 1200w" sizes="(max-width:640px) 92vw, (max-width:1024px) 45vw, 30vw">
+              <img src="assets/img/design/worldcup-1200.webp" alt="美加墨世界杯主题海报" width="1067" height="1163" loading="lazy" decoding="async">
+            </picture>
+            <span class="badge">查看 ↗</span>
+          </span>
+        </button>
+        <h3>美加墨世界杯</h3>
+        <p>2026 年美加墨美加墨世界杯主题海报。主视觉把三国地标与大力神杯叠进同一画面，用手写标题字与高饱和撞色撑起赛事氛围。</p>
+        <ul class="tags"><li><span class="chip">海报</span></li><li><span class="chip">主视觉</span></li><li><span class="chip">手写标题</span></li></ul>
+      </li>
+
+      <li class="card">
+        <button class="view" type="button"
+                data-lb-src="assets/img/design/fahu-1200.webp"
+                data-lb-alt="法护职场主题海报"
+                data-lb-cap="Poster · 驭智守界 · 法护职场">
+          <span class="cv">
+            <picture>
+              <source type="image/avif" srcset="assets/img/design/fahu-640.avif 640w, assets/img/design/fahu-1200.avif 1200w" sizes="(max-width:640px) 92vw, (max-width:1024px) 45vw, 30vw">
+              <img src="assets/img/design/fahu-1200.webp" alt="法护职场主题海报" width="1196" height="1315" loading="lazy" decoding="async">
+            </picture>
+            <span class="badge">查看 ↗</span>
+          </span>
+        </button>
+        <h3>驭智守界 · 法护职场</h3>
+        <p>「人工智能+」背景下工作场所智能化管理的合规治理研究主题海报。深蓝底搭天平与办公场景，把研究选题落到一个可读的视觉入口。</p>
+        <ul class="tags"><li><span class="chip">海报</span></li><li><span class="chip">学术宣传</span></li><li><span class="chip">信息层级</span></li></ul>
+      </li>
+
+      <li class="card">
+        <button class="view" type="button"
+                data-lb-src="assets/img/design/yinling-1200.webp"
+                data-lb-alt="银龄探城主题海报"
+                data-lb-cap="Poster · 银龄探城 · 健康共创">
+          <span class="cv">
+            <picture>
+              <source type="image/avif" srcset="assets/img/design/yinling-640.avif 640w, assets/img/design/yinling-1200.avif 1200w" sizes="(max-width:640px) 92vw, (max-width:1024px) 45vw, 30vw">
+              <img src="assets/img/design/yinling-1200.webp" alt="银龄探城主题海报" width="1086" height="1448" loading="lazy" decoding="async">
+            </picture>
+            <span class="badge">查看 ↗</span>
+          </span>
+        </button>
+        <h3>银龄探城 · 健康共创</h3>
+        <p>武汉大学「银龄行动」主题海报。手写标题配校园实景，把健康调研、短视频创作与社区服务三条行动线收进一张画面。</p>
+        <ul class="tags"><li><span class="chip">海报</span></li><li><span class="chip">公益</span></li><li><span class="chip">手写标题</span></li></ul>
+      </li>
+    </ul>
+    </div>
+
+    <div class="group">
+    <p class="group-label"><span class="mono mute">Decks</span><span class="mono mute">03 套 · 共 61 页</span></p>
+    <ul class="deck decks">
+      <!-- PPT -->
+      <li class="card">
+        <button class="view" type="button"
+                data-lb-src="assets/img/ppt/sunmao-plan-1200.webp"
+                data-lb-alt="榫卯都华韵巡寰 PPT 封面"
+                data-lb-cap="Deck · 榫卯都华韵巡寰（17 页）">
+          <span class="cv">
+            <picture>
+              <source type="image/avif" srcset="assets/img/ppt/sunmao-plan-640.avif 640w, assets/img/ppt/sunmao-plan-1200.avif 1200w" sizes="(max-width:640px) 92vw, (max-width:1024px) 45vw, 30vw">
+              <img src="assets/img/ppt/sunmao-plan-1200.webp" alt="榫卯都华韵巡寰 PPT 封面" width="1200" height="675" loading="lazy" decoding="async">
+            </picture>
+            <span class="badge">查看 ↗</span>
+          </span>
+        </button>
+        <h3>榫卯都华韵巡寰</h3>
+          <p>宿迁榫卯积木花手作跨境拓局方案，17 页完整商业计划陈述。</p>
+          <div class="thumbs">
+            <button type="button" data-lb-src="assets/img/ppt/sunmao-plan-p3-1200.webp" data-lb-alt="榫卯都华韵巡寰 产品介绍页" data-lb-cap="Deck · 榫卯都华韵巡寰 · 产品介绍">
+              <img src="assets/img/ppt/sunmao-plan-p3-1200.webp" alt="榫卯都华韵巡寰 产品介绍页" width="1200" height="675" loading="lazy" decoding="async">
+            </button>
+            <button type="button" data-lb-src="assets/img/ppt/sunmao-plan-p5-1200.webp" data-lb-alt="榫卯都华韵巡寰 市场分析页" data-lb-cap="Deck · 榫卯都华韵巡寰 · 市场分析">
+              <img src="assets/img/ppt/sunmao-plan-p5-1200.webp" alt="榫卯都华韵巡寰 市场分析页" width="1200" height="675" loading="lazy" decoding="async">
+            </button>
+          </div>
+          <ul class="tags"><li><span class="chip">Deck</span></li><li><span class="chip">跨境电商</span></li>        </ul>
+      </li>
+
+      <li class="card">
+        <button class="view" type="button"
+                data-lb-src="assets/img/ppt/intentclaw-1200.webp"
+                data-lb-alt="IntentClaw PPT 封面"
+                data-lb-cap="Deck · IntentClaw（20 页）">
+          <span class="cv">
+            <picture>
+              <source type="image/avif" srcset="assets/img/ppt/intentclaw-640.avif 640w, assets/img/ppt/intentclaw-1200.avif 1200w" sizes="(max-width:640px) 92vw, (max-width:1024px) 45vw, 30vw">
+              <img src="assets/img/ppt/intentclaw-1200.webp" alt="IntentClaw PPT 封面" width="1200" height="675" loading="lazy" decoding="async">
+            </picture>
+            <span class="badge">查看 ↗</span>
+          </span>
+        </button>
+        <h3>IntentClaw</h3>
+          <p>意图驱动网络的技术方案陈述，20 页，从语义契约断层讲到工具编排断层。</p>
+          <div class="thumbs">
+            <button type="button" data-lb-src="assets/img/ppt/intentclaw-p5-1200.webp" data-lb-alt="IntentClaw 方案架构页" data-lb-cap="Deck · IntentClaw · 方案架构">
+              <img src="assets/img/ppt/intentclaw-p5-1200.webp" alt="IntentClaw 方案架构页" width="1200" height="675" loading="lazy" decoding="async">
+            </button>
+            <button type="button" data-lb-src="assets/img/ppt/intentclaw-p13-1200.webp" data-lb-alt="IntentClaw 实现效果页" data-lb-cap="Deck · IntentClaw · 实现效果">
+              <img src="assets/img/ppt/intentclaw-p13-1200.webp" alt="IntentClaw 实现效果页" width="1200" height="675" loading="lazy" decoding="async">
+            </button>
+          </div>
+          <ul class="tags"><li><span class="chip">Deck</span></li><li><span class="chip">网络智能化</span></li>        </ul>
+      </li>
+
+      <li class="card">
+        <button class="view" type="button"
+                data-lb-src="assets/img/ppt/power-safety-1200.webp"
+                data-lb-alt="电力安全智能防控 PPT 封面"
+                data-lb-cap="Deck · 电力安全智能防控（24 页）">
+          <span class="cv">
+            <picture>
+              <source type="image/avif" srcset="assets/img/ppt/power-safety-640.avif 640w, assets/img/ppt/power-safety-1200.avif 1200w" sizes="(max-width:640px) 92vw, (max-width:1024px) 45vw, 30vw">
+              <img src="assets/img/ppt/power-safety-1200.webp" alt="电力安全智能防控 PPT 封面" width="1200" height="675" loading="lazy" decoding="async">
+            </picture>
+            <span class="badge">查看 ↗</span>
+          </span>
+        </button>
+        <h3>电力安全智能防控</h3>
+          <p>基于多源感知与决策增强的电力安全智能防控技术，24 页创新组项目陈述。</p>
+          <div class="thumbs">
+            <button type="button" data-lb-src="assets/img/ppt/power-safety-p12-1200.webp" data-lb-alt="电力安全智能防控 技术框架页" data-lb-cap="Deck · 电力安全智能防控 · 技术框架">
+              <img src="assets/img/ppt/power-safety-p12-1200.webp" alt="电力安全智能防控 技术框架页" width="1200" height="675" loading="lazy" decoding="async">
+            </button>
+            <button type="button" data-lb-src="assets/img/ppt/power-safety-p19-1200.webp" data-lb-alt="电力安全智能防控 营收分析页" data-lb-cap="Deck · 电力安全智能防控 · 营收分析">
+              <img src="assets/img/ppt/power-safety-p19-1200.webp" alt="电力安全智能防控 营收分析页" width="1200" height="675" loading="lazy" decoding="async">
+            </button>
+          </div>
+          <ul class="tags"><li><span class="chip">Deck</span></li><li><span class="chip">电力安全</span></li>        </ul>
+      </li>
+    </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 04 Journey ======================= -->
+<section id="journey" class="journey" data-section="journey" aria-labelledby="journey-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <span class="idx">04</span>
+      <h2 id="journey-title">Journey</h2>
+      <span class="mono mute">2025 — 2026</span>
+    </header>
+
+    <div class="layout">
+      <aside class="intro rv">
+        <p class="lead">代码、设计，<br><em>和它们之间</em><br>那些还在长的事。</p>
+        <p class="mute">一条仍在延伸的时间线。只记录真实发生过的事。</p>
+      </aside>
+
+      <div>
+        <p class="year">2025</p>
+        <ol class="line">
+          <li class="node k-education" tabindex="0">
+            <span class="date">2025.09</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Education</span>
+              <h3>进入武汉大学 · 国家网络安全学院</h3>
+              <p class="place mute">2025 级本科 · 计算机类</p>
+              <div class="more"><div>
+                <p>从 C 语言、数据结构与密码学基础开始，系统学习网络空间安全。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2025.11</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>全国大学生数学竞赛（非数学 A 类）湖北赛区二等奖</h3>
+              <p class="place mute">湖北省赛区</p>
+              <div class="more"><div>
+                <p>以曲线曲面积分、级数与常微分方程为主攻方向。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2025</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>全国大学生「人工智能+」创新创业大赛一等奖</h3>
+              <p class="place mute">国家级</p>
+              <div class="more"><div>
+                <p>负责技术方案与演示材料，完成从选题到路演的完整闭环。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2025</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>第六届全国大学生职业发展大赛一等奖</h3>
+              <p class="place mute">国家级</p>
+              <div class="more"><div>
+                <p>以职业规划书与现场答辩综合评定。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-honor" tabindex="0">
+            <span class="date">2025</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Honor</span>
+              <h3>国家网络安全学院青年志愿者优秀个人奖</h3>
+              <p class="place mute">2025 年度 · 院级</p>
+              <div class="more"><div>
+                <p>年度志愿服务时长与服务项目综合评价。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-practice" tabindex="0">
+            <span class="date">2025 — 2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Practice</span>
+              <h3>学生寒假社会实践活动二等奖</h3>
+              <p class="place mute">武汉大学 · 集体项目</p>
+              <div class="more"><div>
+                <p>参与选题、实地调研与结项报告的撰写与排版。</p>
+              </div></div>
+            </div>
+          </li>
+        </ol>
+
+        <p class="year">2026</p>
+        <ol class="line">
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>C4 网络技术挑战赛选拔赛 B-EP1 赛项华中赛区一等奖（国二）</h3>
+              <p class="place mute">华中赛区 · 国家级二等奖</p>
+              <div class="more"><div>
+                <p>网络技术方向的方案设计与实现类赛项。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>第十九届中国大学生计算机设计大赛中南赛区一等奖（国三）</h3>
+              <p class="place mute">中南赛区 · 国家级三等奖</p>
+              <div class="more"><div>
+                <p>参赛作品为「李凭箜篌引」数字人文小程序与「AI 古建」榫卯可视化，两件作品同届入围。</p>
+                <p><a class="lnk" href="#works">在 Works 里看这两件作品</a></p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>中国国际大学生创新大赛（2026）武汉大学选拔赛银奖</h3>
+              <p class="place mute">武大选拔赛</p>
+              <div class="more"><div>
+                <p>项目计划书与答辩 PPT 的主要制作人之一。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>第十八届「华中杯」大学生数学建模挑战赛三等奖</h3>
+              <p class="place mute">全国 · 三人组队</p>
+              <div class="more"><div>
+                <p>负责建模推导与论文的 LaTeX 排版。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>武汉大学信息安全竞赛作品赛三等奖</h3>
+              <p class="place mute">校级</p>
+              <div class="more"><div>
+                <p>信息安全方向的完整作品类赛道。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-competition" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Competition</span>
+              <h3>全国大学生英语竞赛三等奖</h3>
+              <p class="place mute">国家级</p>
+              <div class="more"><div>
+                <p>全国大学生英语竞赛 C 类。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-honor" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Honor</span>
+              <h3>武汉大学社会活动先进个人</h3>
+              <p class="place mute">校级</p>
+              <div class="more"><div>
+                <p>年度社会活动参与度与组织工作综合评定。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-honor" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Honor</span>
+              <h3>武汉大学 CTF 俱乐部年度校赛先进个人</h3>
+              <p class="place mute">校级</p>
+              <div class="more"><div>
+                <p>CTF 俱乐部年度赛事参与与贡献评定。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-honor" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Honor</span>
+              <h3>国家网络安全学院团学优秀工作者</h3>
+              <p class="place mute">2025—2026 学年 · 院级</p>
+              <div class="more"><div>
+                <p>学年团学工作岗位考核评定。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-practice" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Practice</span>
+              <h3>科研课题：Benchmark 评测体系构建（US-Eval / Traj-Eval）</h3>
+              <p class="place mute">科研训练 · 有论文产出</p>
+              <div class="more"><div>
+                <p>全程参与基准数据集搭建与标准化评测体系设计，负责 agent 轨迹的生成、指标口径对齐与打分流程落地。</p>
+              </div></div>
+            </div>
+          </li>
+
+          <li class="node k-practice" tabindex="0">
+            <span class="date">2026</span>
+            <span class="mark" aria-hidden="true"><i></i></span>
+            <div class="body">
+              <span class="kind mono mute">Practice</span>
+              <h3>把四个小程序与一套设计系统做到能上线</h3>
+              <p class="place mute">独立完成 · 产品 / 开发 / 美工</p>
+              <div class="more"><div>
+                <p>从需求梳理、界面设计到部署上线全部自己走完，顺带攒下这套作品集站点。</p>
+              </div></div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ======================= 05 Contact ======================= -->
+<footer id="contact" class="foot" data-section="contact" data-tone="dark">
+  <div class="wrap">
+    <p class="line-1">Let's make <em>something</em> worth a second look.</p>
+
+    <div class="cols">
+      <div>
+        <p class="mono mute" style="color:var(--lab-mute);margin-bottom:var(--s-3)">Email</p>
+        <a class="mail" href="mailto:zhou20070502@qq.com">zhou20070502@qq.com</a>
+      </div>
+      <dl>
+        <div><dt>Name</dt><dd>周昊 / Zhou Hao</dd></div>
+        <div><dt>Based</dt><dd>Wuhan, China</dd></div>
+        <div><dt>School</dt><dd>武汉大学国家网络安全学院</dd></div>
+      </dl>
+      <dl>
+        <div><dt>Built</dt><dd>HTML · CSS · Canvas 2D</dd></div>
+        <div><dt>Since</dt><dd>2025 级本科</dd></div>
+        <div><dt>Focus</dt><dd>AI 应用 · 小程序 · 设计</dd></div>
+      </dl>
+    </div>
+
+    <div class="legal">
+      <span>© 2026 周昊 · Zhou Hao</span>
+      <span>本站为个人作品集，与武汉大学官方无关。</span>
+    </div>
+  </div>
+</footer>
+
+<!-- 灯箱 -->
+<div class="lb" data-lb role="dialog" aria-modal="true" aria-label="图片预览">
+  <button class="x" type="button">关闭 ESC</button>
+  <img src="" alt="">
+  <p class="cap"></p>
+</div>
+
+<script src="assets/js/main.js" defer></script>
+<script type="module">
+  /* 首屏山脊：动态加载，任何失败都退回静态 ridge.svg。
+     HTML 上初始为 data-gl="none"（保证无 JS 时也能看到山脊），
+     挂载成功后必须显式切到 "on"，否则会一直显示静态降级图。 */
+  const hero = document.getElementById('intro');
+  const cv = document.querySelector('[data-hero-canvas]');
+  const fail = () => { hero.dataset.gl = 'none'; };
+  const start = () => {
+    import('./assets/js/hero-ridge.js')
+      .then((m) => {
+        if (cv && m.mount(hero, cv)) hero.dataset.gl = 'on';
+        else fail();
+      })
+      .catch(fail);
+  };
+  const idle = window.requestIdleCallback || ((f) => setTimeout(f, 600));
+  if (cv) idle(start, { timeout: 600 });
+</script>
+</body>
+</html>
