@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="周昊">
-  <rect width="64" height="64" rx="14" fill="#f1efea"/>
-  <path d="M9 41c7 0 9-19 16-19s7 24 14 24 7-14 12-14 4 7 8 7"
-        fill="none" stroke="#e5482d" stroke-width="4.4"
+  <!-- 山脊取幕布与珞珈山的形，点取粒子场里的亮星；配色走站点的纸白 / 墨绿 / 青。
+       16px 下只有三个元素，不用贝塞尔（缩到 16px 会糊成毛边）。 -->
+  <rect width="64" height="64" rx="14" fill="#F7F6F2"/>
+  <path d="M11 45 L26 26 L36 36 L49 18" fill="none" stroke="#245D50" stroke-width="7"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="53" cy="32" r="3.4" fill="#2f5d50"/>
+  <circle cx="49" cy="18" r="6" fill="#35C9E0"/>
 </svg>
