@@ -26,12 +26,20 @@ report about this project has to be honest about which parts are whose.
      so the sun direction can be driven from outside;
   2. the upstream intro block (`Ultra-Realistic Water` plus two paragraphs of
      technique description) replaced with this project's own readout;
-  3. a "Time of day" slider and an "Auto cycle" switch added to the panel, and
+  3. the two comparison toggles — **Footprint fade** and **Normals** — removed
+     from the panel together with the two warnings they produced. Both drove
+     uniforms (`uFootprint`, `uPixelNormals`) that already default to 1, so the
+     picture is unchanged; the panel controller had no null guards, so it was
+     rewritten in the same edit rather than deleted around;
+  4. a "Time of day" control and an "Auto cycle" switch added to the panel, and
      the panel's status line reworded from an upstream technique note to a
      functional label (`Controls · sea state, light and camera`);
-  4. `app.js` appended.
+  5. the page title, meta description and favicon replaced (upstream's were
+     `Ultra-Realistic Water — Three.js · WebGL2 · GLSL`, a Gerstner technique
+     write-up, and its own sun-over-wave mark);
+  6. `app.js` appended.
 - **Not modified**: any shader, any geometry, the camera rig, the ocean module,
-  the post chain, or the existing panel controls.
+  the post chain, or the remaining panel controls.
 
 ## This project's own work
 
@@ -46,6 +54,16 @@ report about this project has to be honest about which parts are whose.
   fade out at midday and come back at dusk instead of glowing at noon. **Dusk is snapshotted from the live scene at
   boot rather than hard-coded**, so the default state is identical to upstream.
 - the readout block at the top-left and its styling
+- the panel rewrite — guards on every lookup, the four-stop time axis (a
+  continuous fill for position, four labels for the nearest preset), the
+  keyboard step-through, and a fix for an upstream bug where writing the status
+  line's `textContent` destroyed the inner `<span>` that the phone drawer's
+  ellipsis depends on
+- the first-paint gate: a `LOADING` line that hands over when the compositor has
+  already faded the picture in, with separate messages for a missing WebGL2
+  context and a shader-compilation failure
+- shareable URL state — `?t=` and `?sea=` written with `replaceState`, other
+  query parameters left untouched
 - `tools/` — the extraction and screenshot tooling used during development
 - `docs/` — the reference frame measurements used to set the composition
 

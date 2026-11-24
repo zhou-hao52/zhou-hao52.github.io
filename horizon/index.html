@@ -3,9 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ultra-Realistic Water — Three.js · WebGL2 · GLSL</title>
-<meta name="description" content="Eight deep-water Gerstner waves shaded per pixel from analytic derivatives, each faded at its own pixel footprint, with Fresnel sky reflection, subsurface light, Jacobian foam and a Kelvin wake.">
-<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNycgZmlsbD0nIzIwMWEzMycvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMTQnIHI9JzUnIGZpbGw9JyNmZmIyN2EnLz48cGF0aCBkPSdNNSAyMWMzLjUtMiA3LjUtMiAxMSAwczcuNSAyIDExIDAnIHN0cm9rZT0nI2Y2ZThkOCcgc3Ryb2tlLXdpZHRoPScyJyBmaWxsPSdub25lJy8+PC9zdmc+">
+<title>horizon</title>
+<meta name="description" content="A three-masted ship under sail on open water. Move the light from dawn through noon and dusk into night; the sky, sea and lanterns follow.">
+<meta name="theme-color" content="#000000">
+<meta property="og:type" content="website">
+<meta property="og:title" content="horizon">
+<meta property="og:description" content="A three-masted ship under sail on open water. Move the light from dawn through noon and dusk into night; the sky, sea and lanterns follow.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNycgZmlsbD0nIzIwMWEzMycvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMjAnIHI9JzEwJyBmaWxsPScjZmZiMjdhJyBvcGFjaXR5PScuMTMnLz48cGF0aCBkPSdNOS41IDIwYTYuNSA2LjUgMCAwIDEgMTMgMHonIGZpbGw9JyNmZmIyN2EnLz48cGF0aCBkPSdNNCAyMC41aDI0JyBzdHJva2U9JyNmNmU4ZDgnIHN0cm9rZS13aWR0aD0nMicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJy8+PC9zdmc+">
 <style>
 html,body{margin:0;height:100%;overflow:hidden;background:#000;touch-action:none;overscroll-behavior:none}
 canvas{display:block;width:100vw;height:100vh;cursor:grab;outline:none}
@@ -58,11 +63,6 @@ fieldset.ow-row legend{float:left;padding:0}
 .ow-switch:checked::after{transform:translateX(16px);background:#2a1a12}
 
 /* segmented radios */
-.ow-seg{display:inline-flex;padding:2px;border-radius:9px;background:rgba(255,232,210,.1)}
-.ow-seg label{position:relative;cursor:pointer}
-.ow-seg input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.ow-seg span{display:block;padding:5px 10px;border-radius:7px;font-size:12px;color:var(--ink-2);white-space:nowrap}
-.ow-seg input:checked + span{background:var(--ink);color:#1d1420}
 
 /* range */
 .ow-range{display:flex;align-items:center;gap:calc(var(--u)*1.25)}
@@ -82,7 +82,6 @@ fieldset.ow-row legend{float:left;padding:0}
   font:11px/1.4 var(--mono);letter-spacing:.02em;color:var(--ink-3)}
 
 .ow-switch:focus-visible,.ow-btn:focus-visible,.ow-range input:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
-.ow-seg input:focus-visible + span{outline:2px solid var(--sun);outline-offset:1px}
 .ow-sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 @media (max-width:1180px),(max-height:760px){
@@ -110,6 +109,55 @@ fieldset.ow-row legend{float:left;padding:0}
 }
 @media (prefers-reduced-motion:reduce){
   .ow-switch,.ow-switch::after{transition:none}
+}
+
+/* --- time of day: full-width track, four preset stops ---------------------
+   The fill (--fill, set from JS) shows the continuous position; the labels
+   below show which of the four presets is nearest. Two jobs, no conflict --
+   which is why there are no tick marks: the track is only 3 px tall. */
+.ow-row.ow-stack{display:block}
+.ow-time-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ow-time-head output{font:500 11px/1 var(--mono);color:var(--ink-2)}
+.ow-row.ow-stack .ow-range{margin-top:6px}
+.ow-range input.ow-time{width:100%}          /* beats .ow-range input{width:132/112/110px} on specificity */
+.ow-ticks{position:relative;height:20px;margin-top:1px}
+.ow-tick{
+  position:absolute;top:0;left:calc(var(--p) * 1%);transform:translateX(-50%);
+  display:flex;align-items:center;height:20px;padding:0 5px;
+  font:500 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:color .18s ease;
+}
+.ow-tick[data-t="0"]{--p:0;transform:none}
+.ow-tick[data-t="1"]{--p:33.333}
+.ow-tick[data-t="2"]{--p:66.667}
+.ow-tick[data-t="3"]{--p:100;transform:translateX(-100%)}
+.ow-tick[data-on]{color:var(--sun)}
+.ow-tick:hover{color:var(--ink)}
+@media (max-width:640px){
+  .ow-ticks{height:24px}
+  .ow-tick{height:24px;font-size:9px;letter-spacing:.06em;padding:0 3px}
+}
+
+/* --- first paint gate -----------------------------------------------------
+   Cold start on this machine is ~5.3 s before the first frame: 810 KB of
+   inlined scene plus shader compilation. The line creeps to 90% and stops --
+   claiming a real number would be a lie, a fading spinner would compete with
+   the picture. */
+.hz-load{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:#000;
+  font-family:var(--mono);color:var(--ink-3);transition:opacity .6s ease}
+.hz-load[data-out]{opacity:0;pointer-events:none}
+.hz-load-in{display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 24px}
+.hz-load-t{font-size:10px;line-height:1;letter-spacing:.26em;text-transform:uppercase}
+.hz-bar{display:block;width:132px;height:1px;background:rgba(246,232,216,.16);overflow:hidden}
+.hz-bar i{display:block;height:100%;background:var(--sun);transform:scaleX(0);transform-origin:left;
+  animation:hz-grow 6s cubic-bezier(.15,.7,.3,1) forwards}
+.hz-load[data-out] .hz-bar i{animation:none;transform:scaleX(1);transition:transform .3s ease}
+.hz-load-e{max-width:280px;font-size:11px;line-height:1.65;text-align:center;color:var(--ink-2)}
+@keyframes hz-grow{from{transform:scaleX(0)}to{transform:scaleX(.9)}}
+@media (prefers-reduced-motion:reduce){
+  .ow-tick{transition:none}
+  .hz-bar i{animation:none;transform:scaleX(.9)}
 }
 </style>
 <style>
@@ -157,6 +205,67 @@ fieldset.ow-row legend{float:left;padding:0}
 <body>
 <main>
 <canvas id="c" role="img" aria-label="A three-masted ship under sail at sunset on a rolling open sea, with sun glitter, foam along the hull and a spreading Kelvin wake."></canvas>
+<div class="hz-load" id="hz-load" role="status" aria-live="polite">
+  <div class="hz-load-in">
+    <span class="hz-load-t">Loading</span>
+    <span class="hz-bar"><i></i></span>
+    <span class="hz-load-e" id="hz-load-e" hidden></span>
+  </div>
+</div>
+<script>
+// First paint gate. 810 KB of inlined scene plus shader compilation means the
+// first frame can take seconds; without this the page is a black rectangle and
+// the viewer has no way to tell waiting from broken.
+(() => {
+  const el = document.getElementById('hz-load');
+  if (!el) return;
+  const label = el.querySelector('.hz-load-t');
+  const note = document.getElementById('hz-load-e');
+  const t0 = performance.now();
+  const bail = (title, text) => {
+    if (label && title) label.textContent = title;
+    if (note) { note.hidden = false; if (text) note.textContent = text; }
+  };
+
+  if (!('WebGL2RenderingContext' in window)) {
+    bail('No WebGL2', 'This scene needs WebGL2. Try a current Chrome, Edge, Safari or Firefox.');
+    return;
+  }
+
+  // three throws while creating the context or compiling shaders, which is an
+  // uncaught error from a later script -- catch it at window level. Ignore
+  // anything arriving after the scene is already up.
+  window.addEventListener('error', (e) => {
+    if (window.__ship || el.dataset.done) return;
+    bail('Cannot start', 'The renderer failed to start on this device. ' + (e.message || ''));
+  }, { once: true });
+
+  const done = () => {
+    if (el.dataset.done) return;
+    el.dataset.done = '1';
+    el.setAttribute('data-out', '');
+    setTimeout(() => el.remove(), 700);
+  };
+
+  // __ship exists from the end of the first composited frame, but uFade is
+  // still 0 there: the picture is black. The composite ramps uFade 0 -> 1 over
+  // 2.6 s, so handing over at 45% means the viewer takes over an image that is
+  // already visible instead of a flash of black.
+  const poll = () => {
+    const s = window.__ship;
+    if (s && s.frame >= 2) {
+      const u = s.post && s.post.composite && s.post.composite.uniforms.uFade;
+      const f = u && u.value !== undefined ? u.value : 1;
+      if (f > 0.45 || performance.now() - t0 > 6000) return done();
+    }
+    if (performance.now() - t0 > 12000) {
+      return bail('Still loading', 'If the page stays black, this device may not support the shaders this scene needs.');
+    }
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+})();
+</script>
 <div class="ow-scrim" aria-hidden="true"></div>
 <div class="hr-readout" aria-label="Conditions">
   <div class="hr-cell"><span class="hr-k">TIME</span><span class="hr-v" id="hr-time">18:52</span></div>
@@ -166,28 +275,25 @@ fieldset.ow-row legend{float:left;padding:0}
 <form class="ow-panel" aria-label="Water controls" autocomplete="off" onsubmit="return false">
   <p class="ow-status" id="ow-status" role="status" aria-live="polite"><span class="hr-txt">Controls &middot; sea state, light and camera</span></p>
   <div class="ow-row">
-    <label for="ow-foot">Footprint fade</label>
-    <input class="ow-switch" id="ow-foot" type="checkbox" role="switch" checked>
-  </div>
-  <fieldset class="ow-row">
-    <legend>Normals</legend>
-    <div class="ow-seg">
-      <label><input type="radio" name="ow-normals" value="1" checked><span>Per pixel</span></label>
-      <label><input type="radio" name="ow-normals" value="0"><span>Per vertex</span></label>
-    </div>
-  </fieldset>
-  <div class="ow-row">
     <label for="ow-sea">Sea state</label>
     <div class="ow-range">
       <input id="ow-sea" type="range" min="0.4" max="1.6" step="0.05" value="1" aria-describedby="ow-sea-out">
       <output id="ow-sea-out" for="ow-sea">1.00&times;</output>
     </div>
   </div>
-  <div class="ow-row">
-    <label for="hr-mode">Time of day</label>
-    <div class="ow-range">
-      <input id="hr-mode" type="range" min="0" max="3" step="0.01" value="2" aria-describedby="hr-mode-out">
+  <div class="ow-row ow-stack">
+    <div class="ow-time-head">
+      <label for="hr-mode">Time of day</label>
       <output id="hr-mode-out" for="hr-mode">DUSK</output>
+    </div>
+    <div class="ow-range">
+      <input class="ow-time" id="hr-mode" type="range" min="0" max="3" step="0.01" value="2" aria-describedby="hr-mode-out">
+    </div>
+    <div class="ow-ticks" aria-hidden="true">
+      <span class="ow-tick" data-t="0">DAWN</span>
+      <span class="ow-tick" data-t="1">NOON</span>
+      <span class="ow-tick" data-t="2">DUSK</span>
+      <span class="ow-tick" data-t="3">NIGHT</span>
     </div>
   </div>
   <div class="ow-row">
@@ -205,8 +311,12 @@ fieldset.ow-row legend{float:left;padding:0}
 </form>
 </main>
 <script>
-// Demo controller. Runs before the scene bundle; the bundle fills in
+// Panel controller. Runs before the scene bundle; the bundle fills in
 // __OD.waves / __OD.ocean / __OD.refl as it builds the ocean from ocean.mjs.
+// Every lookup below is optional: a control that is missing degrades to "not
+// wired" instead of throwing and killing the rest of this IIFE. The previous
+// version had no guards, which is why the two comparison toggles could not be
+// removed without rewriting this block in the same edit.
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const OD = (window.__OD = {
@@ -224,70 +334,148 @@ fieldset.ow-row legend{float:left;padding:0}
   reduce.addEventListener?.('change', (e) => { OD.frozen = e.matches; OD.touch(); });
 
   const $ = (id) => document.getElementById(id);
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
   const status = $('ow-status');
-  const foot = $('ow-foot');
+  // The copy lives in an inner <span class="hr-txt">: on phones .ow-status is the
+  // drawer handle and .hr-txt carries the ellipsis. Writing textContent on the
+  // <p> deletes that span, so write the span instead.
+  const statusTxt = status ? (status.querySelector('.hr-txt') || status) : null;
   const sea = $('ow-sea');
   const seaOut = $('ow-sea-out');
+  const mode = $('hr-mode');
+  const ticks = document.querySelector('.ow-ticks');
   const shotN = $('ow-shot-n');
 
+  const say = (text, warn) => {
+    if (!status) return;
+    if (statusTxt && statusTxt.textContent !== text) statusTxt.textContent = text;
+    status.toggleAttribute('data-warn', !!warn);
+  };
+
+  // Only one live hint now. The two upstream warnings (footprint fade off,
+  // per-vertex normals) went away with the controls that produced them.
   const describe = () => {
-    const pixel = document.querySelector('input[name="ow-normals"]:checked').value === '1';
-    if (!foot.checked && !pixel) return ['Footprint fade off and per-vertex normals: the far sea aliases and the glitter breaks into facets.', true];
-    if (!foot.checked) return ['Footprint fade off: 3–8 m waves are sampled below their wavelength and alias into moiré toward the horizon.', true];
-    if (!pixel) return ['Per-vertex normals: the glitter follows mesh facets and the short waves vanish past the near field.', true];
-    if (+sea.value > 1.23) return ['Amplitude keeps rising; steepness is capped so the eight Q values still sum below 0.95.', false];
+    if (sea && +sea.value > 1.23)
+      return ['Crests stop sharpening past 1.25\u00d7 \u2014 wave slope is capped so the surface stays consistent.', false];
     return ['Controls \u00b7 sea state, light and camera', false];
   };
   const refresh = () => {
     const [text, warn] = describe();
-    if (status.textContent !== text) status.textContent = text;
-    status.toggleAttribute('data-warn', warn);
+    say(text, warn);
     OD.touch();
   };
 
-  foot.addEventListener('change', () => {
-    if (OD.ocean) OD.ocean.uniforms.uFootprint.value = foot.checked ? 1 : 0;
-    refresh();
-  });
-  document.querySelectorAll('input[name="ow-normals"]').forEach((r) =>
-    r.addEventListener('change', () => {
-      if (OD.ocean) OD.ocean.uniforms.uPixelNormals.value = +r.value;
+  // ---- sea state ----------------------------------------------------------
+  // ?sea= is applied here, before the bundle runs, so the amplitude reaches the
+  // shader through __OD.sync() on the very first frame instead of popping in.
+  const boot = new URLSearchParams(location.search);
+
+  if (sea) {
+    const v0 = parseFloat(boot.get('sea'));
+    if (Number.isFinite(v0)) {
+      const step = +sea.step || 0.05;
+      sea.value = String(clamp(Math.round(v0 / step) * step, +sea.min, +sea.max));
+    }
+    const setSea = () => {
+      const v = +sea.value;
+      if (seaOut) seaOut.textContent = v.toFixed(2) + '\u00d7';
+      sea.style.setProperty('--fill', ((v - +sea.min) / (+sea.max - +sea.min)) * 100 + '%');
+      OD.waves?.setSeaState(v);
       refresh();
-    })
-  );
-  const setSea = () => {
-    const v = +sea.value;
-    seaOut.textContent = v.toFixed(2) + '×';
-    sea.style.setProperty('--fill', ((v - +sea.min) / (+sea.max - +sea.min)) * 100 + '%');
-    OD.waves?.setSeaState(v);
-    refresh();
-  };
-  sea.addEventListener('input', setSea);
-  setSea();
-  // Called by the bundle once the ocean exists, so restored form state reaches the shader.
-  OD.sync = () => {
-    OD.ocean.uniforms.uFootprint.value = foot.checked ? 1 : 0;
-    OD.ocean.uniforms.uPixelNormals.value = +document.querySelector('input[name="ow-normals"]:checked').value;
+    };
+    sea.addEventListener('input', setSea);
+    OD.setSea = setSea;
     setSea();
+  }
+
+  // ---- time of day: fill + nearest preset ---------------------------------
+  // Two separate readings of the same control: the fill shows the continuous
+  // position, the four labels show which preset is nearest. That is why there
+  // are no tick marks -- the track is only 3 px tall.
+  const paintTime = () => {
+    if (!mode) return;
+    const lo = +mode.min || 0, hi = +mode.max || 3;
+    mode.style.setProperty('--fill', ((+mode.value - lo) / (hi - lo)) * 100 + '%');
+    if (!ticks) return;
+    const near = Math.round(clamp(+mode.value, lo, hi));
+    ticks.querySelectorAll('.ow-tick').forEach((el) => {
+      el.toggleAttribute('data-on', +el.dataset.t === near);
+    });
   };
 
-  $('ow-next').addEventListener('click', () => {
+  if (mode) {
+    // One hundredth of a preset per arrow press is useless; step whole presets.
+    mode.addEventListener('keydown', (e) => {
+      const hi = +mode.max || 3;
+      const cur = Math.round(clamp(+mode.value, 0, hi));
+      let to = null;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'PageDown') to = cur - 1;
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'PageUp') to = cur + 1;
+      else if (e.key === 'Home') to = 0;
+      else if (e.key === 'End') to = hi;
+      if (to === null) return;
+      e.preventDefault();
+      mode.value = String(clamp(to, 0, hi));
+      mode.dispatchEvent(new Event('input', { bubbles: true })); // app.js owns easing + palette
+      paintTime();
+    });
+    mode.addEventListener('input', paintTime);
+  }
+
+  if (ticks) {
+    // Pointer-only shortcut. The range stays the single accessible control, so
+    // the labels are aria-hidden and unfocusable: Tab lands on the slider once.
+    ticks.addEventListener('pointerdown', (e) => {
+      const el = e.target.closest('.ow-tick');
+      if (!el || !mode) return;
+      e.preventDefault();
+      mode.value = el.dataset.t;
+      mode.dispatchEvent(new Event('input', { bubbles: true }));
+      paintTime();
+    });
+  }
+  paintTime(); // before the bundle's first frame, so the track is never off by 12 %
+
+  // ---- camera -------------------------------------------------------------
+  let lastShot = -1;
+  const showShot = (announce) => {
+    const rig = window.__ship?.rig;
+    if (!rig || rig.shot === lastShot) return;
+    lastShot = rig.shot;
+    if (shotN) shotN.textContent = rig.shot + 1 + ' / 7';
+    // On phones the status line is the drawer handle; overwriting it there both
+    // hides the label and breaks the ellipsis.
+    if (announce && !matchMedia('(max-width: 700px)').matches) say('Shot ' + (rig.shot + 1) + ' of 7.', false);
+  };
+
+  const next = $('ow-next');
+  if (next) next.addEventListener('click', () => {
     const rig = window.__ship?.rig;
     if (!rig) return;
     rig.setShot(rig.shot + 1);
     OD.touch();
     showShot(true);
   });
-  // The rig cycles shots on its own; mirror its index without touching the DOM every frame.
-  let lastShot = -1;
-  const showShot = (announce) => {
-    const rig = window.__ship?.rig;
-    if (!rig || rig.shot === lastShot) return;
-    lastShot = rig.shot;
-    shotN.textContent = rig.shot + 1 + ' / 7';
-    if (announce) status.textContent = 'Shot ' + (rig.shot + 1) + ' of 7.';
+
+  // Called by the bundle once the ocean exists (end of the scene script:
+  // __OD.sync && __OD.sync()). It must exist: without it the shader keeps the
+  // pre-restore amplitude and nothing complains.
+  OD.sync = () => {
+    const U = OD.ocean && OD.ocean.uniforms;
+    if (U) {
+      // The two comparison toggles are gone from the UI. Both uniforms already
+      // default to 1 in the material; this keeps the intent explicit rather
+      // than relying on nobody ever writing 0 again.
+      if (U.uFootprint) U.uFootprint.value = 1;      // footprint fade on
+      if (U.uPixelNormals) U.uPixelNormals.value = 1; // per-pixel normals
+    }
+    OD.setSea?.();
   };
-  setInterval(() => showShot(false), 500);
+
+  // The rig cycles shots on its own and app.js animates the slider; poll both
+  // instead of touching the DOM every frame.
+  setInterval(() => { showShot(false); paintTime(); }, 400);
 })();
 </script>
 <script>

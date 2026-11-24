@@ -26,6 +26,15 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // The range fill is a CSS gradient on --fill. The panel script paints it on
+  // input; the auto cycle moves the same slider without any input event, so it
+  // has to paint too or the yellow bar freezes while the thumb walks.
+  function paintFill(el) {
+    if (!el) return;
+    const lo = +el.min || 0, hi = +el.max || 3;
+    el.style.setProperty('--fill', ((+el.value - lo) / (hi - lo)) * 100 + '%');
+  }
+
   let ship = null;
   let skyMats = [];
   let dusk = null;           // snapshot of the reference palette
@@ -242,14 +251,24 @@
       if (o.isPointLight) lampBase.lights.push({ light: o, base: o.intensity });
     });
 
+    // ---- time of day: initial value from ?t= -------------------------------
+    // Continuous, not a preset index: ?t=1.4 is a legal washed-out noon. A
+    // missing or unparsable value keeps DEFAULTS, an out-of-range one clamps,
+    // and the result is rounded to two decimals to match what writeURL() emits,
+    // so reloading a shared link never drifts.
+    const MAXT = OVERRIDES.length - 1;
+    const tv = parseFloat(new URLSearchParams(location.search).get('t'));
+    if (Number.isFinite(tv)) t = target = Math.min(MAXT, Math.max(0, Math.round(tv * 100) / 100));
+
     const slider = $('hr-mode');
     if (slider) {
-      slider.value = String(DEFAULTS);
+      slider.value = String(t);
+      paintFill(slider);
       slider.addEventListener('input', () => {
         auto = false;
         const box = $('hr-auto');
         if (box) box.checked = false;
-        target = +slider.value; t = target; apply();
+        target = +slider.value; t = target; paintFill(slider); apply();
       });
     }
     const autoBox = $('hr-auto');
@@ -264,6 +283,27 @@
       sea.addEventListener('input', sync);
       sync();
     }
+
+    // ---- URL state ---------------------------------------------------------
+    // replaceState, not pushState: one drag fires dozens of input events and the
+    // back button would then walk through dozens of identical states. The query
+    // string is read from the live URL and only our two keys are overwritten,
+    // so ?sharecode= and anything else survives.
+    let urlTimer = 0;
+    const writeURL = () => {
+      clearTimeout(urlTimer);
+      urlTimer = setTimeout(() => {
+        const q = new URLSearchParams(location.search);
+        q.set('t', String(Math.round(t * 100) / 100));
+        const seaEl = $('ow-sea');
+        if (seaEl) q.set('sea', (+seaEl.value).toFixed(2));
+        try {
+          history.replaceState(null, '', location.pathname + '?' + q.toString() + location.hash);
+        } catch (err) { /* file:// blocks replaceState in some browsers */ }
+      }, 250);
+    };
+    slider?.addEventListener('input', writeURL);
+    $('ow-sea')?.addEventListener('input', writeURL);
 
     apply();
     return true;
@@ -283,7 +323,7 @@
       if (t > OVERRIDES.length - 1) t = 0;
       target = t;
       const slider = $('hr-mode');
-      if (slider) slider.value = String(t);
+      if (slider) { slider.value = String(t); paintFill(slider); }
       apply();
     } else if (Math.abs(t - target) > 0.0008) {
       t += (target - t) * (1 - Math.exp(-dt * 5.0));
