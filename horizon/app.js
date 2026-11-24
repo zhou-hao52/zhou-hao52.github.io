@@ -8,18 +8,36 @@
  *  loop re-applies every frame from the ship's position.
  *
  *  Integration surface, and nothing else:
- *    · one patched line reads `window.__SUN_DIR || Id` for the light direction
- *    · this file writes that vector, the light's colour/intensity, and the sky +
- *      ocean palette uniforms
- *  No scene code is edited beyond that single line.
+ *    · two patched lines read `window.__SUN_DIR || Id` -- the key light, and the
+ *      glare/rays projection (missing the second one left the bloom anchored to
+ *      the sunset azimuth at every time of day)
+ *    · two patched lines scale the lamp material and its four point lights by
+ *      `window.__LAMP`: the render loop owns their flicker, this file owns the
+ *      time-of-day factor. It has to be a multiplier read by the loop, not a
+ *      write from here -- the loop runs last, so a direct write never reaches
+ *      the lamp and the hood glows at noon
+ *    · this file writes that vector, the light's colour/intensity, the sky and
+ *      ocean palette uniforms, the window glass, and the readout
+ *  No scene code is edited beyond those four lines and the flag removal.
  *
  *  DUSK is not hard-coded: it is snapshotted from the live scene at boot, so the
  *  default state is byte-identical to upstream. The other three presets only
  *  override the keys listed; everything else falls back to the snapshot.
+ *
+ *  The clock is continuous, not a preset name. Each stop carries a wall-clock
+ *  minute (05:47 / 12:31 / 18:52 / 23:14) and the neighbours are interpolated,
+ *  so the time walks forward while the slider walks forward. The wrap from night
+ *  back to dawn is the one edge that cannot be a straight line -- the cycle is a
+ *  closed loop -- so it gets LOOP_SEC to itself: palette, sun and lamps
+ *  cross-dissolve from NIGHT to DAWN while the clock runs 23:14 -> 00:00 ->
+ *  05:47, the slider stays pinned at the end, and it returns to the start only
+ *  once both ends of the picture are already identical.
  * ------------------------------------------------------------------------- */
 (() => {
   const DEFAULTS = 2;        // DUSK
   const AUTO_SPEED = 0.05;   // presets per second (~20 s per step)
+  const LOOP_SEC = 5;        // night -> dawn dissolve before the cycle restarts
+  const MAXT = 3;
 
   // Keys we must not interpolate: the cloud drift is animated by the scene.
   const SKIP = new Set(['uCloudOff', 'uSunDir']);
@@ -35,16 +53,27 @@
     el.style.setProperty('--fill', ((+el.value - lo) / (hi - lo)) * 100 + '%');
   }
 
+  // Minutes since midnight -> "HH:MM". Wrap before rounding: 1439.7 would
+  // otherwise round to 1440 and print "24:00".
+  function clockText(m) {
+    const v = ((m % 1440) + 1440) % 1440;
+    const r = Math.round(v) % 1440;
+    const h = Math.floor(r / 60), mm = r % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (mm < 10 ? '0' : '') + mm;
+  }
+
   let ship = null;
   let skyMats = [];
   let dusk = null;           // snapshot of the reference palette
   let t = DEFAULTS, target = DEFAULTS, auto = false;
   let sunV = null;
-  const lampBase = { material: null, glass: null, materialEI: 0, glassEI: 0, lights: [] };
+  let loop = null;           // { t0 } while the night -> dawn dissolve runs
+  let state = null;          // preallocated mix target: nothing allocates per frame
+  const glass = { mat: null, base: 0 };
 
   const OVERRIDES = [
     {
-      key: 'DAWN', clock: '05:47', lamp: 0.50,
+      key: 'DAWN', min: 5 * 60 + 47, lamp: 0.50,
       // sun: just above the horizon, ahead and to the right
       sun: { dir: [0.74, 0.075, 0.67], color: [1.00, 0.72, 0.55], intensity: 2.3 },
       sky: {
@@ -69,7 +98,7 @@
       },
     },
     {
-      key: 'NOON', clock: '12:31', lamp: 0.00,
+      key: 'NOON', min: 12 * 60 + 31, lamp: 0.00,
       sun: { dir: [0.52, 0.70, 0.49], color: [1.00, 0.96, 0.90], intensity: 4.1 },
       sky: {
         uZenith: [0.095, 0.285, 0.720],
@@ -93,7 +122,7 @@
       },
     },
     {
-      key: 'DUSK', clock: '18:52', lamp: 1.00,
+      key: 'DUSK', min: 18 * 60 + 52, lamp: 1.00,
       sun: { dir: [0.66, 0.100, 0.745], color: [1.00, 0.60, 0.34], intensity: 3.3 },
       sky: null,      // null = the live snapshot, untouched
       ocean: {
@@ -104,7 +133,7 @@
       },
     },
     {
-      key: 'NIGHT', clock: '23:14', lamp: 1.00,
+      key: 'NIGHT', min: 23 * 60 + 14, lamp: 1.00,
       sun: { dir: [0.60, 0.130, 0.79], color: [0.58, 0.68, 1.00], intensity: 0.62 },
       sky: {
         uZenith: [0.0055, 0.0090, 0.0270],
@@ -144,48 +173,94 @@
     return out;
   }
 
-  function lerp(a, b, u) {
-    if (Array.isArray(a) && Array.isArray(b)) return a.map((x, i) => x + (b[i] - x) * u);
-    if (typeof a === 'number' && typeof b === 'number') return a + (b - a) * u;
-    return u < 0.5 ? a : b;
+  // ------------------------------------------------------------ state buffers
+  // One object, allocated once. The earlier version built a fresh sky object,
+  // an ocean object and sixteen little arrays on every frame (twice per frame
+  // while the loop dissolved), which is a steady drip of young-gen garbage on a
+  // phone and buys nothing: every key is known up front.
+  function allocState() {
+    const st = {
+      sky: {}, ocean: {}, dir: [0, 0, 0], color: [0, 0, 0],
+      intensity: 0, lamp: 0, minutes: 0,
+    };
+    for (const [k, v] of Object.entries(dusk)) st.sky[k] = Array.isArray(v) ? [0, 0, 0] : 0;
+    for (const k of Object.keys(OVERRIDES[0].ocean)) st.ocean[k] = [0, 0, 0];
+    return st;
   }
 
-  function sample() {
-    const c = Math.min(Math.max(t, 0), OVERRIDES.length - 1);
-    const i = Math.min(Math.floor(c), OVERRIDES.length - 2);
-    const u = c - i;
-    const A = OVERRIDES[i], B = OVERRIDES[i + 1];
-    const base = dusk;
+  // A -> B in place. `minutes` is passed separately because the night -> dawn
+  // leg has to cross midnight (1394 -> 1787 -> mod 1440), which no plain lerp of
+  // the two stops can express.
+  function mixPair(A, B, u, minutes) {
+    const st = state;
+    for (const k in st.sky) {
+      const a = (A.sky && A.sky[k] !== undefined) ? A.sky[k] : dusk[k];
+      const b = (B.sky && B.sky[k] !== undefined) ? B.sky[k] : dusk[k];
+      const o = st.sky[k];
+      if (Array.isArray(o)) {
+        o[0] = a[0] + (b[0] - a[0]) * u;
+        o[1] = a[1] + (b[1] - a[1]) * u;
+        o[2] = a[2] + (b[2] - a[2]) * u;
+      } else {
+        st.sky[k] = a + (b - a) * u;
+      }
+    }
+    for (const k in st.ocean) {
+      const a = A.ocean[k], b = B.ocean[k], o = st.ocean[k];
+      o[0] = a[0] + (b[0] - a[0]) * u;
+      o[1] = a[1] + (b[1] - a[1]) * u;
+      o[2] = a[2] + (b[2] - a[2]) * u;
+    }
+    for (let i = 0; i < 3; i++) {
+      st.dir[i] = A.sun.dir[i] + (B.sun.dir[i] - A.sun.dir[i]) * u;
+      st.color[i] = A.sun.color[i] + (B.sun.color[i] - A.sun.color[i]) * u;
+    }
+    st.intensity = A.sun.intensity + (B.sun.intensity - A.sun.intensity) * u;
+    // Lamps go out with the sunrise, not with the clock. A straight ramp from
+    // dawn's 0.50 to noon's 0.00 still had them visibly glowing at 09:00; the
+    // falling side is therefore shaped. Only dawn -> noon has a falling side
+    // (noon -> dusk -> night rise and hold), so those stops stay exact.
+    st.lamp = A.lamp + (B.lamp - A.lamp) * (B.lamp < A.lamp ? 1 - (1 - u) * (1 - u) * (1 - u) : u);
+    st.minutes = minutes;
+  }
 
-    const sky = {};
-    for (const k of Object.keys(base)) {
-      const a = (A.sky && A.sky[k] !== undefined) ? A.sky[k] : base[k];
-      const b = (B.sky && B.sky[k] !== undefined) ? B.sky[k] : base[k];
-      sky[k] = lerp(a, b, u);
-    }
-    const ocean = {};
-    for (const k of Object.keys(A.ocean)) {
-      ocean[k] = lerp(A.ocean[k], B.ocean[k], u);
-    }
-    return {
-      sky, ocean,
-      dir: lerp(A.sun.dir, B.sun.dir, u),
-      color: lerp(A.sun.color, B.sun.color, u),
-      intensity: A.sun.intensity + (B.sun.intensity - A.sun.intensity) * u,
-      lamp: A.lamp + (B.lamp - A.lamp) * u,
-      key: u < 0.5 ? A.key : B.key,
-      clock: u < 0.5 ? A.clock : B.clock,
-    };
+  // Slider position -> palette. Between stops the clock walks linearly between
+  // their wall-clock minutes, which is why 09:09 sits halfway from dawn to noon.
+  function segmentAt(u) {
+    const c = Math.min(Math.max(u, 0), MAXT);
+    const i = Math.min(Math.floor(c), MAXT - 1);
+    const f = c - i;
+    const A = OVERRIDES[i], B = OVERRIDES[i + 1];
+    mixPair(A, B, f, A.min + (B.min - A.min) * f);
+  }
+
+  function loopAt(w) {
+    const A = OVERRIDES[MAXT], B = OVERRIDES[0];
+    mixPair(A, B, w, A.min + (B.min + 1440 - A.min) * w);
+  }
+
+  // What the panel's output slot says. A single name only when the slider is
+  // actually parked on that stop; otherwise both ends, or 15:40 would still
+  // read "DUSK".
+  function label() {
+    if (loop) return OVERRIDES[MAXT].key + ' \u2192 ' + OVERRIDES[0].key;
+    const near = Math.round(t);
+    if (Math.abs(t - near) < 0.08) return OVERRIDES[near].key;
+    const i = Math.min(Math.floor(t), MAXT - 1);
+    return OVERRIDES[i].key + ' \u2192 ' + OVERRIDES[i + 1].key;
   }
 
   function apply() {
-    if (!ship || !dusk) return;
-    const s = sample();
+    if (!ship || !dusk || !state) return;
+    const s = state;
 
     const L = Math.hypot(s.dir[0], s.dir[1], s.dir[2]) || 1;
     if (!sunV) sunV = { x: 0, y: 0, z: 0 };
     sunV.x = s.dir[0] / L; sunV.y = s.dir[1] / L; sunV.z = s.dir[2] / L;
     window.__SUN_DIR = sunV;
+    // Read by the render loop every frame, after this one: a multiplier is the
+    // only ownership split that survives that ordering.
+    window.__LAMP = s.lamp;
 
     const light = ship.sun;
     if (light) {
@@ -195,36 +270,56 @@
 
     for (const mat of skyMats) {
       const U = mat.uniforms;
-      for (const [k, v] of Object.entries(s.sky)) {
+      for (const k in s.sky) {
         const u = U[k];
         if (!u) continue;
-        if (Array.isArray(v) && u.value && u.value.set) u.value.set(v[0], v[1], v[2]);
-        else if (typeof v === 'number') u.value = v;
+        const v = s.sky[k];
+        if (typeof v === 'number') u.value = v;
+        else if (u.value && u.value.set) u.value.set(v[0], v[1], v[2]);
       }
       if (U.uSunDir && U.uSunDir.value && U.uSunDir.value.set) {
         U.uSunDir.value.set(sunV.x, sunV.y, sunV.z);
       }
     }
 
-    if (lampBase.material) lampBase.material.emissiveIntensity = lampBase.materialEI * s.lamp;
-    if (lampBase.glass) lampBase.glass.emissiveIntensity = lampBase.glassEI * s.lamp;
-    for (const e of lampBase.lights) e.light.intensity = e.base * s.lamp;
+    if (glass.mat) glass.mat.emissiveIntensity = glass.base * s.lamp;
 
     const u = ship.ocean && ship.ocean.uniforms;
     if (u) {
-      for (const [k, v] of Object.entries(s.ocean)) {
+      for (const k in s.ocean) {
         const uu = u[k];
-        if (uu && uu.value && uu.value.set) uu.value.set(v[0], v[1], v[2]);
+        if (uu && uu.value && uu.value.set) {
+          const v = s.ocean[k];
+          uu.value.set(v[0], v[1], v[2]);
+        }
       }
     }
 
     const timeEl = $('hr-time'), sunEl = $('hr-sun'), outEl = $('hr-mode-out');
-    if (timeEl && timeEl.textContent !== s.clock) timeEl.textContent = s.clock;
-    if (outEl && outEl.textContent !== s.key) outEl.textContent = s.key;
+    const clock = clockText(s.minutes);
+    if (timeEl && timeEl.textContent !== clock) timeEl.textContent = clock;
+    const lab = label();
+    if (outEl && outEl.textContent !== lab) outEl.textContent = lab;
     if (sunEl) {
       const el = (Math.asin(Math.max(-1, Math.min(1, sunV.y))) * 180 / Math.PI).toFixed(1);
       sunEl.textContent = el.padStart(4, '0') + '\u00b0';
     }
+  }
+
+  function paintSlider(v) {
+    const slider = $('hr-mode');
+    if (!slider) return;
+    const s = String(v);
+    if (slider.value !== s) slider.value = s;
+    paintFill(slider);
+  }
+
+  // Auto cycles can be paused by reduced-motion, in which case the render loop
+  // holds the last frame. A running clock over a frozen picture is not a still,
+  // it is a lie: nudge the loop whenever the palette actually moves.
+  function wake() {
+    const od = window.__OD;
+    if (od && od.frozen) od.touch();
   }
 
   function bind() {
@@ -238,25 +333,18 @@
     if (!skyMats.length) return false;
 
     dusk = snapshotSky();
+    state = allocState();
 
-    // Lanterns. Three separate things carry the glow: the lamp material's
-    // emissive, the glass panes', and four point lights. The bases are read off
-    // the live scene so dusk stays exactly as upstream.
+    // Only the window glass is ours: the render loop does not touch it, so this
+    // is the one lamp channel a per-frame write from here can win.
     const M = (ship.ship && ship.ship.materials) || {};
-    if (M.lamp) lampBase.material = M.lamp;
-    if (M.glass) lampBase.glass = M.glass;
-    if (M.lamp) lampBase.materialEI = M.lamp.emissiveIntensity;
-    if (M.glass) lampBase.glassEI = M.glass.emissiveIntensity;
-    ship.scene.traverse((o) => {
-      if (o.isPointLight) lampBase.lights.push({ light: o, base: o.intensity });
-    });
+    if (M.glass) { glass.mat = M.glass; glass.base = M.glass.emissiveIntensity; }
 
     // ---- time of day: initial value from ?t= -------------------------------
     // Continuous, not a preset index: ?t=1.4 is a legal washed-out noon. A
     // missing or unparsable value keeps DEFAULTS, an out-of-range one clamps,
     // and the result is rounded to two decimals to match what writeURL() emits,
     // so reloading a shared link never drifts.
-    const MAXT = OVERRIDES.length - 1;
     const tv = parseFloat(new URLSearchParams(location.search).get('t'));
     if (Number.isFinite(tv)) t = target = Math.min(MAXT, Math.max(0, Math.round(tv * 100) / 100));
 
@@ -265,10 +353,12 @@
       slider.value = String(t);
       paintFill(slider);
       slider.addEventListener('input', () => {
+        loop = null;
         auto = false;
         const box = $('hr-auto');
         if (box) box.checked = false;
-        target = +slider.value; t = target; paintFill(slider); apply();
+        target = +slider.value; t = target; paintFill(slider);
+        segmentAt(t); apply();
       });
     }
     const autoBox = $('hr-auto');
@@ -305,6 +395,7 @@
     slider?.addEventListener('input', writeURL);
     $('ow-sea')?.addEventListener('input', writeURL);
 
+    segmentAt(t);
     apply();
     return true;
   }
@@ -318,15 +409,42 @@
 
     if (!bound) { bound = bind(); return; }
 
+    // ---- night -> dawn: the one edge that is not a straight line -----------
+    if (loop) {
+      const raw = Math.min(1, Math.max(0, (now - loop.t0) / (LOOP_SEC * 1000)));
+      const w = raw * raw * (3 - 2 * raw);   // smoothstep: no velocity step at either end
+      loopAt(w);
+      apply();
+      paintSlider(MAXT);
+      wake();
+      if (raw >= 1) {
+        loop = null;
+        t = target = 0;
+        paintSlider(0);
+        segmentAt(0);
+        apply();
+      }
+      return;
+    }
+
     if (auto) {
       t += dt * AUTO_SPEED;
-      if (t > OVERRIDES.length - 1) t = 0;
+      if (t >= MAXT) {
+        t = target = MAXT;
+        loop = { t0: now };
+        loopAt(0);
+        apply();
+        paintSlider(MAXT);
+        return;
+      }
       target = t;
-      const slider = $('hr-mode');
-      if (slider) { slider.value = String(t); paintFill(slider); }
+      paintSlider(t);
+      segmentAt(t);
       apply();
+      wake();
     } else if (Math.abs(t - target) > 0.0008) {
       t += (target - t) * (1 - Math.exp(-dt * 5.0));
+      segmentAt(t);
       apply();
     }
   }
