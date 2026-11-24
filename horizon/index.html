@@ -247,10 +247,16 @@ fieldset.ow-row legend{float:left;padding:0}
     setTimeout(() => el.remove(), 700);
   };
 
-  // __ship exists from the end of the first composited frame, but uFade is
-  // still 0 there: the picture is black. The composite ramps uFade 0 -> 1 over
-  // 2.6 s, so handing over at 45% means the viewer takes over an image that is
-  // already visible instead of a flash of black.
+  // __ship exists from the end of the first composited frame. Handing over at
+  // frame 2 is safe: the composite is already drawing by then.
+  //
+  // Thresholds. 12 s was too tight: measured at 8x CPU throttling the scene is
+  // ready at 12.02 s, so a mid-range phone could get the warning one frame
+  // before the picture arrived. 30 s is long enough that the note means it.
+  const SOFT = 30000;
+  const GIVE_UP = 90000;
+  let softSaid = false;
+
   const poll = () => {
     const s = window.__ship;
     if (s && s.frame >= 2) {
@@ -258,9 +264,14 @@ fieldset.ow-row legend{float:left;padding:0}
       const f = u && u.value !== undefined ? u.value : 1;
       if (f > 0.45 || performance.now() - t0 > 6000) return done();
     }
-    if (performance.now() - t0 > 12000) {
-      return bail('Still loading', 'If the page stays black, this device may not support the shaders this scene needs.');
+    const elapsed = performance.now() - t0;
+    // Keep polling after the note. Stopping here was the bug: a scene arriving
+    // at 12.1 s left the note covering a perfectly working page for ever.
+    if (elapsed > SOFT && !softSaid) {
+      softSaid = true;
+      bail('Still loading', 'This takes a little longer on a slower device.');
     }
+    if (elapsed > GIVE_UP) return;
     requestAnimationFrame(poll);
   };
   requestAnimationFrame(poll);
